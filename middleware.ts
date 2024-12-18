@@ -1,20 +1,33 @@
-import { type NextRequest } from "next/server";
-import { updateSession } from "@/utils/supabase/middleware";
+import { type NextRequest, NextResponse } from "next/server";
+import { protectedRouteGuard } from "@/features/auth/middleware/auth-middleware";
+import { hasRole } from "@/features/auth/utils/role-utils";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  const result = await protectedRouteGuard(request);
+  
+  if (result instanceof NextResponse) {
+    return result;
+  }
+
+  const { user, response } = result;
+
+  // Check for admin routes
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    if (user.error || !user.data.user) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
+
+    const isUserAdmin = await hasRole(user.data.user.id, "admin");
+    if (!isUserAdmin) {
+      return NextResponse.redirect(new URL("/unauthorized", request.url));
+    }
+  }
+
+  return response;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * Feel free to modify this pattern to include more paths.
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
