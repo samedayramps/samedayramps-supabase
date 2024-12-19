@@ -1,7 +1,6 @@
 import { AuthHeader } from "@/features/auth/components/AuthHeader";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { ThemeProvider } from "@/components/theme-provider";
 import { GeistSans } from "geist/font/sans";
-import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -22,14 +21,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
-        <ThemeProvider>
-          <div className="min-h-screen">
-            <nav className="w-full flex justify-between items-center p-3 text-sm">
-              <AuthHeader />
-              <ThemeSwitcher />
-            </nav>
-            {children}
-          </div>
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="system" 
+          enableSystem 
+          disableTransitionOnChange
+        >
+          {children}
         </ThemeProvider>
       </body>
     </html>

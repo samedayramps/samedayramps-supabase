@@ -9,6 +9,65 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      customer_accessibility_requirements: {
+        Row: {
+          assistance_required: boolean | null
+          created_at: string
+          customer_id: string
+          device_length: number | null
+          device_turning_radius: number | null
+          device_width: number | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_relationship: string | null
+          id: string
+          mobility_device: string
+          special_requirements: string[] | null
+          updated_at: string
+          user_weight: number | null
+        }
+        Insert: {
+          assistance_required?: boolean | null
+          created_at?: string
+          customer_id: string
+          device_length?: number | null
+          device_turning_radius?: number | null
+          device_width?: number | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
+          id?: string
+          mobility_device: string
+          special_requirements?: string[] | null
+          updated_at?: string
+          user_weight?: number | null
+        }
+        Update: {
+          assistance_required?: boolean | null
+          created_at?: string
+          customer_id?: string
+          device_length?: number | null
+          device_turning_radius?: number | null
+          device_width?: number | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
+          id?: string
+          mobility_device?: string
+          special_requirements?: string[] | null
+          updated_at?: string
+          user_weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_accessibility_requirements_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           city: string | null
@@ -53,6 +112,77 @@ export type Database = {
           zip_code?: string | null
         }
         Relationships: []
+      }
+      installation_details: {
+        Row: {
+          actual_length: number | null
+          actual_rise: number | null
+          created_at: string
+          equipment_used: string[] | null
+          handrails_secure: boolean | null
+          id: string
+          installation_end: string | null
+          installation_start: string | null
+          installed_by: string[] | null
+          job_id: string
+          modification_details: string | null
+          modifications_required: boolean | null
+          number_of_sections: number | null
+          photos: Json | null
+          platform_secure: boolean | null
+          proper_slope: boolean | null
+          surface_stable: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          actual_length?: number | null
+          actual_rise?: number | null
+          created_at?: string
+          equipment_used?: string[] | null
+          handrails_secure?: boolean | null
+          id?: string
+          installation_end?: string | null
+          installation_start?: string | null
+          installed_by?: string[] | null
+          job_id: string
+          modification_details?: string | null
+          modifications_required?: boolean | null
+          number_of_sections?: number | null
+          photos?: Json | null
+          platform_secure?: boolean | null
+          proper_slope?: boolean | null
+          surface_stable?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          actual_length?: number | null
+          actual_rise?: number | null
+          created_at?: string
+          equipment_used?: string[] | null
+          handrails_secure?: boolean | null
+          id?: string
+          installation_end?: string | null
+          installation_start?: string | null
+          installed_by?: string[] | null
+          job_id?: string
+          modification_details?: string | null
+          modifications_required?: boolean | null
+          number_of_sections?: number | null
+          photos?: Json | null
+          platform_secure?: boolean | null
+          proper_slope?: boolean | null
+          surface_stable?: boolean | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "installation_details_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_locations: {
         Row: {

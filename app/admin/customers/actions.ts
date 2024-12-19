@@ -5,6 +5,7 @@ import { Customer } from "./types"
 import { revalidatePath } from "next/cache"
 import { getCurrentUser } from '@/features/auth/utils/auth-utils'
 import { requireRole } from '@/features/auth/utils/role-utils'
+import { CustomerAccessibilityRequirements } from "./types"
 
 export async function searchCustomers(searchTerm: string) {
   const supabase = getServiceSupabase()
@@ -163,4 +164,43 @@ export async function updateCustomersStatus(customerIds: string[], status: Custo
   }
 
   revalidatePath("/admin/customers")
+}
+
+export async function updateAccessibilityRequirements(
+  customerId: string,
+  data: Partial<CustomerAccessibilityRequirements>
+) {
+  const supabase = getServiceSupabase()
+
+  const { error } = await supabase
+    .from("customer_accessibility_requirements")
+    .upsert({
+      customer_id: customerId,
+      ...data,
+      updated_at: new Date().toISOString(),
+    })
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  revalidatePath(`/admin/customers/${customerId}`)
+}
+
+export async function getAccessibilityRequirements(customerId: string) {
+  const supabase = getServiceSupabase()
+
+  const { data, error } = await supabase
+    .from("customer_accessibility_requirements")
+    .select()
+    .eq("customer_id", customerId)
+    .single()
+
+  if (error && error.code !== "PGRST116") {
+    throw new Error(error.message)
+  }
+
+  return data
 } 

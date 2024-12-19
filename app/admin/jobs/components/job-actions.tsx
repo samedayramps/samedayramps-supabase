@@ -10,19 +10,23 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal } from "lucide-react"
 import { deleteJobs, updateJob } from "../actions"
-import { createJobInvoice, cancelJobSubscription } from "../actions/stripe-actions"
+import { createSetupFeeInvoice, createMonthlyInvoice, cancelJobSubscription } from "../actions/stripe-actions"
 import { Job } from "../types"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface JobActionsProps {
   job: Job
 }
 
 export function JobActions({ job }: JobActionsProps) {
+  const router = useRouter()
+
   const handleDelete = async () => {
     try {
       await deleteJobs([job.id])
       toast.success("Job deleted successfully")
+      router.push("/admin/jobs")
     } catch (error) {
       console.error("Error deleting job:", error)
       toast.error("Failed to delete job")
@@ -39,13 +43,23 @@ export function JobActions({ job }: JobActionsProps) {
     }
   }
 
-  const handleCreateInvoice = async () => {
+  const handleCreateSetupFeeInvoice = async () => {
     try {
-      await createJobInvoice(job.id)
-      toast.success("Invoice created and sent successfully")
+      await createSetupFeeInvoice(job.id)
+      toast.success("Setup fee invoice created and sent")
     } catch (error) {
-      console.error("Error creating invoice:", error)
-      toast.error("Failed to create invoice")
+      console.error("Error creating setup fee invoice:", error)
+      toast.error("Failed to create setup fee invoice")
+    }
+  }
+
+  const handleCreateMonthlyInvoice = async () => {
+    try {
+      await createMonthlyInvoice(job.id)
+      toast.success("Monthly rental invoice created")
+    } catch (error) {
+      console.error("Error creating monthly invoice:", error)
+      toast.error("Failed to create monthly invoice")
     }
   }
 
@@ -69,32 +83,28 @@ export function JobActions({ job }: JobActionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem
-          onClick={() => handleStatusUpdate("completed")}
-        >
+        <DropdownMenuItem onClick={() => handleStatusUpdate("completed")}>
           Mark as Completed
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => handleStatusUpdate("cancelled")}
-        >
+        <DropdownMenuItem onClick={() => handleStatusUpdate("cancelled")}>
           Mark as Cancelled
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={handleCreateInvoice}
-        >
-          Send Invoice
-        </DropdownMenuItem>
+        {job.setup_fee > 0 && !job.setup_fee_payment_url && (
+          <DropdownMenuItem onClick={handleCreateSetupFeeInvoice}>
+            Send Setup Fee Invoice
+          </DropdownMenuItem>
+        )}
+        {job.monthly_rate > 0 && !job.monthly_payment_url && (
+          <DropdownMenuItem onClick={handleCreateMonthlyInvoice}>
+            Start Monthly Rental
+          </DropdownMenuItem>
+        )}
         {job.stripe_subscription_id && (
-          <DropdownMenuItem
-            onClick={handleCancelSubscription}
-          >
+          <DropdownMenuItem onClick={handleCancelSubscription}>
             Cancel Subscription
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem
-          onClick={handleDelete}
-          className="text-red-600"
-        >
+        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>

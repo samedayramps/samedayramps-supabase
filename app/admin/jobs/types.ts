@@ -56,6 +56,31 @@ export interface Customer {
   updated_at: string
 }
 
+export interface InstallationDetails {
+  id: string
+  job_id: string
+  installed_by: string[]
+  installation_start: string | null
+  installation_end: string | null
+  equipment_used: string[]
+  modifications_required: boolean
+  modification_details?: string
+  actual_length: number
+  actual_rise: number
+  number_of_sections: number
+  handrails_secure: boolean
+  surface_stable: boolean
+  proper_slope: boolean
+  platform_secure: boolean
+  photos: {
+    before: string[]
+    after: string[]
+    details: string[]
+  }
+  created_at: string
+  updated_at: string
+}
+
 export interface Job {
   id: string
   customer_id: string
@@ -67,11 +92,12 @@ export interface Job {
   stripe_subscription_id: string | null
   created_at: string
   updated_at: string
-  setup_fee_payment_url: string | null;
-  monthly_payment_url: string | null;
+  setup_fee_payment_url: string | null
+  monthly_payment_url: string | null
   // Relations
   customer?: Customer
   locations?: JobLocation[]
   payments?: JobPayment[]
   notes?: JobNote[]
+  installation_details?: InstallationDetails
 } 
